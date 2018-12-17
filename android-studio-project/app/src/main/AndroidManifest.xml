@@ -36,6 +36,8 @@
         <activity android:name=".EditPengumumanActivity"/>
         <activity android:name=".EditJadwalSeminarTaActivity"/>
         <activity android:name=".EditJadwalSidangTaActivity"/>
+        <activity android:name=".ProfileActivity"/>
+        <activity android:name=".EditProfileActivity"/>
 
         <receiver android:name=".util.AlarmReceiver"/>
         <service android:name=".util.AlarmNotificationService"/>

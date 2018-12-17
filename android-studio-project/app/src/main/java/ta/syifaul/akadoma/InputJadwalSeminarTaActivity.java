@@ -11,16 +11,20 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,9 +35,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -48,13 +54,20 @@ public class InputJadwalSeminarTaActivity extends AppCompatActivity {
     private PendingIntent pendingIntent;
     private static final int ALARM_REQUEST_CODE = 133;
 
-    EditText edtNama, edtKelas, edtJudul, edt_Pembimbing1, edt_Pembimbing2, edt_Penguji1, edt_Penguji2, edt_Ruangan;
+    EditText edtKelas, edtJudul, edt_Ruangan;
+    AutoCompleteTextView edtNama, edt_Pembimbing1, edt_Pembimbing2, edt_Penguji1, edt_Penguji2;
     Button btnTgl, btnWaktu, btnSimpan;
 
     private ProgressDialog pDialog;
+    private ArrayAdapter<String> adapter;
+    private List<String> list;
+    private ArrayAdapter<String> adapterMhs;
+    private List<String> list_mhs;
 
     SessionManager session;
     private static String url = Config.HOST+"input_jdw_sm_ta.php";
+    private static String url_dt_dosen_koor = Config.HOST+"data_dosen_koor.php";
+    private static String url_dt_mhs = Config.HOST+"data_mhs.php";
 
     private Calendar kalender;
     private int hari, bulan, tahun;
@@ -84,13 +97,13 @@ public class InputJadwalSeminarTaActivity extends AppCompatActivity {
         menit       = kalender.get(Calendar.MINUTE);
 
         ///
-        edtNama = (EditText) findViewById(R.id.edt_nama);
+        edtNama = (AutoCompleteTextView) findViewById(R.id.edt_nama);
         edtKelas = (EditText) findViewById(R.id.edt_kelas);
         edtJudul = (EditText) findViewById(R.id.edt_jdl);
-        edt_Pembimbing1 = (EditText) findViewById(R.id.edt_pembimbing1);
-        edt_Pembimbing2 = (EditText) findViewById(R.id.edt_pembimbing2);
-        edt_Penguji1 = (EditText) findViewById(R.id.edt_penguji1);
-        edt_Penguji2 = (EditText) findViewById(R.id.edt_penguji2);
+        edt_Pembimbing1 = (AutoCompleteTextView) findViewById(R.id.edt_pembimbing1);
+        edt_Pembimbing2 = (AutoCompleteTextView) findViewById(R.id.edt_pembimbing2);
+        edt_Penguji1 = (AutoCompleteTextView) findViewById(R.id.edt_penguji1);
+        edt_Penguji2 = (AutoCompleteTextView) findViewById(R.id.edt_penguji2);
         edt_Ruangan = (EditText) findViewById(R.id.edt_ruangan);
         ///
 
@@ -115,18 +128,30 @@ public class InputJadwalSeminarTaActivity extends AppCompatActivity {
         btnSimpan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String nama = edtNama.getText().toString();
-                String kelas = edtKelas.getText().toString();
-                String judul = edtJudul.getText().toString();
-                String pbb1 = edt_Pembimbing1.getText().toString();
-                String pbb2 = edt_Pembimbing2.getText().toString();
-                String pgj1 = edt_Penguji1.getText().toString();
-                String pgj2 = edt_Penguji2.getText().toString();
-                String ruangan = edt_Ruangan.getText().toString();
+                if(tanggal == null){
+                    Toast.makeText(InputJadwalSeminarTaActivity.this, "Tanggal harus ditentukan", Toast.LENGTH_SHORT).show();
+                }
+                else if(waktu == null){
+                    Toast.makeText(InputJadwalSeminarTaActivity.this, "Waktu harus ditentukan", Toast.LENGTH_SHORT).show();
+                }else{
+                    String nama = edtNama.getText().toString();
+                    String kelas = edtKelas.getText().toString();
+                    String judul = edtJudul.getText().toString();
+                    String pbb1 = edt_Pembimbing1.getText().toString();
+                    String pbb2 = edt_Pembimbing2.getText().toString();
+                    String pgj1 = edt_Penguji1.getText().toString();
+                    String pgj2 = edt_Penguji2.getText().toString();
+                    String ruangan = edt_Ruangan.getText().toString();
 
-                new prosesSimpan(nama, kelas, judul, pbb1, pbb2, pgj1, pgj2, ruangan, tanggal, waktu).execute();
+                    new prosesSimpan(nama, kelas, judul, pbb1, pbb2, pgj1, pgj2, ruangan, tanggal, waktu).execute();
+                }
             }
         });
+
+        list = new ArrayList<String>();
+        list_mhs = new ArrayList<String>();
+        new getDataDsnKoor().execute();
+        new getDataMhs().execute();
     }
 
     @Override
@@ -264,6 +289,175 @@ public class InputJadwalSeminarTaActivity extends AppCompatActivity {
             else{
                 Toast.makeText(InputJadwalSeminarTaActivity.this, psn, Toast.LENGTH_SHORT).show();
             }
+        }
+
+    }
+
+    private class getDataMhs extends AsyncTask<Void,Void,String> {
+
+        //variabel untuk tangkap data
+        private int scs = 0;
+        private String psn, nama_user;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+//            pDialog = new ProgressDialog(InputJadwalSeminarTaActivity.this);
+//            pDialog.setMessage("Memuat data...");
+//            pDialog.setIndeterminate(false);
+//            pDialog.setCancelable(false);
+//            pDialog.show();
+        }
+
+        protected String doInBackground(Void... params) {
+
+            try{
+                //susun parameter
+                HashMap<String,String> detail = new HashMap<>();
+
+                try {
+                    //convert this HashMap to encodedUrl to send to php file
+                    String dataToSend = hashMapToUrl(detail);
+                    //make a Http request and send data to php file
+                    String response = Request.post(url_dt_mhs,dataToSend);
+
+                    //dapatkan respon
+                    Log.e("Respon", response);
+
+                    JSONObject ob = new JSONObject(response);
+                    scs = ob.getInt("success");
+
+                    if (scs == 1) {
+                        JSONArray products = ob.getJSONArray("field");
+
+                        for (int i = 0; i < products.length(); i++) {
+                            JSONObject c = products.getJSONObject(i);
+
+                            // Storing each json item in variable
+                            nama_user = c.getString("nama");
+                            list_mhs.add(nama_user);
+                        }
+
+                    } else {
+                        // no data found
+                        //psn = ob.getString("message");
+                    }
+
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+//            pDialog.dismiss();
+            if (scs == 1) {
+                String[] data_user = list_mhs.toArray(new String[list_mhs.size()]);
+
+                adapterMhs = new ArrayAdapter<String>
+                        (InputJadwalSeminarTaActivity.this, android.R.layout.select_dialog_item, data_user);
+
+                edtNama.setThreshold(1);
+                edtNama.setAdapter(adapterMhs);
+            } else {
+                Toast.makeText(InputJadwalSeminarTaActivity.this, "Terjadi kesalahan saat memuat data dosen", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+
+    }
+
+    private class getDataDsnKoor extends AsyncTask<Void,Void,String> {
+
+        //variabel untuk tangkap data
+        private int scs = 0;
+        private String psn, nama_user;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(InputJadwalSeminarTaActivity.this);
+            pDialog.setMessage("Memuat data...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        protected String doInBackground(Void... params) {
+
+            try{
+                //susun parameter
+                HashMap<String,String> detail = new HashMap<>();
+
+                try {
+                    //convert this HashMap to encodedUrl to send to php file
+                    String dataToSend = hashMapToUrl(detail);
+                    //make a Http request and send data to php file
+                    String response = Request.post(url_dt_dosen_koor,dataToSend);
+
+                    //dapatkan respon
+                    Log.e("Respon", response);
+
+                    JSONObject ob = new JSONObject(response);
+                    scs = ob.getInt("success");
+
+                    if (scs == 1) {
+                        JSONArray products = ob.getJSONArray("field");
+
+                        for (int i = 0; i < products.length(); i++) {
+                            JSONObject c = products.getJSONObject(i);
+
+                            // Storing each json item in variable
+                            nama_user = c.getString("nama");
+                            list.add(nama_user);
+                        }
+
+                    } else {
+                        // no data found
+                        //psn = ob.getString("message");
+                    }
+
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            pDialog.dismiss();
+            if (scs == 1) {
+                String[] data_user = list.toArray(new String[list.size()]);
+
+                adapter = new ArrayAdapter<String>
+                        (InputJadwalSeminarTaActivity.this, android.R.layout.select_dialog_item, data_user);
+
+                edt_Pembimbing1.setThreshold(1);
+                edt_Pembimbing1.setAdapter(adapter);
+
+                edt_Pembimbing2.setThreshold(1);
+                edt_Pembimbing2.setAdapter(adapter);
+
+                edt_Penguji1.setThreshold(1);
+                edt_Penguji1.setAdapter(adapter);
+
+                edt_Penguji2.setThreshold(1);
+                edt_Penguji2.setAdapter(adapter);
+            } else {
+                Toast.makeText(InputJadwalSeminarTaActivity.this, "Terjadi kesalahan saat memuat data dosen", Toast.LENGTH_SHORT).show();
+            }
+
         }
 
     }

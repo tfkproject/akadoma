@@ -41,7 +41,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 }
                 else{
                     Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
-                    intent.putExtra("level", level_); //akan di paket di fragment jadwal dan pengumuman
+                    intent.putExtra("level", level_); //akan di pake di fragment jadwal dan pengumuman
                     startActivity(intent);
                     finish();
                 }
