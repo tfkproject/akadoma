@@ -3,10 +3,9 @@
 $response = array();
 // include db connect class
 require 'koneksi.php';
-$identitas = $_POST['no_id'];
-$password = $_POST['pass'];
-$level = $_POST['level'];
-if($result = $db->query("SELECT * FROM user where no_identitas = '$identitas' and password = '$password' and level = '$level'")){
+$id_user = $_POST['id_user'];
+
+if($result = $db->query("SELECT * FROM user where id_user = '$id_user'")){
 	if($count = $result->num_rows){
 		$response["field"] = array();
 		
@@ -14,15 +13,16 @@ if($result = $db->query("SELECT * FROM user where no_identitas = '$identitas' an
 			$data = array();
 			$data["id_user"] = $row->id_user;
 			$data["no_identitas"] = $row->no_identitas;	
-			$nama = $data["nama"] = $row->nama;
+			$data["nama"] = $row->nama;
 			$data["no_tlp"] = $row->no_tlp;	
+			$data["password"] = $row->password;
 			$data["level"] = $row->level;					
 			
 			array_push($response["field"], $data);
 		}
 		
 		$response["success"] = 1;
-		$response["message"] = "Selamat datang $nama";
+		$response["message"] = "Data ditemukan";
 		
 		// echoing JSON response
 		echo json_encode($response);
@@ -30,7 +30,7 @@ if($result = $db->query("SELECT * FROM user where no_identitas = '$identitas' an
 	else{
 	    // no datas found
         $response["success"] = 0;
-        $response["message"] = "Maaf, nomor identitas atau password anda salah";
+        $response["message"] = "Data tidak ditemukan";
         // echo no users JSON
         echo json_encode($response);
 	}
