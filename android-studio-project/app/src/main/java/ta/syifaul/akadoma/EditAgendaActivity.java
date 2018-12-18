@@ -111,10 +111,24 @@ public class EditAgendaActivity extends AppCompatActivity {
         btnSimpan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String judul = edtJudul.getText().toString();
-                String ket = edtKeterangan.getText().toString();
+                if(edtJudul.getText().toString().length() > 0 && edtKeterangan.getText().toString().length() > 0){
+                    if(tanggal == null){
+                        Toast.makeText(EditAgendaActivity.this, "Tanggal harus ditentukan", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(waktu == null){
+                        Toast.makeText(EditAgendaActivity.this, "Waktu harus ditentukan", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        String judul = edtJudul.getText().toString();
+                        String ket = edtKeterangan.getText().toString();
 
-                new prosesUpdate(id_agenda, id_user, judul, ket, tanggal, waktu).execute();
+                        new prosesUpdate(id_agenda, id_user, judul, ket, tanggal, waktu).execute();
+                    }
+                }
+                else{
+                    Toast.makeText(EditAgendaActivity.this, "Field tidak boleh kosong", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 

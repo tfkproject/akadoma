@@ -42,7 +42,7 @@
                     android:hint="Ruangan"
                     android:inputType="textPersonName"/>
 
-                <EditText
+                <AutoCompleteTextView
                     android:id="@+id/edt_nama"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -63,28 +63,28 @@
                     android:hint="Judul"
                     android:inputType="textMultiLine"/>
 
-                <EditText
+                <AutoCompleteTextView
                     android:id="@+id/edt_pembimbing1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Pembimbing 1"
                     android:inputType="textPersonName"/>
 
-                <EditText
+                <AutoCompleteTextView
                     android:id="@+id/edt_pembimbing2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Pembimbing 2"
                     android:inputType="textPersonName"/>
 
-                <EditText
+                <AutoCompleteTextView
                     android:id="@+id/edt_penguji1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Penguji 1"
                     android:inputType="textPersonName"/>
 
-                <EditText
+                <AutoCompleteTextView
                     android:id="@+id/edt_penguji2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
