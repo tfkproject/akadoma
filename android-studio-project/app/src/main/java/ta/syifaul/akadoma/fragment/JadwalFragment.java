@@ -12,8 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import ta.syifaul.akadoma.InputJadwalSeminarKpActivity;
 import ta.syifaul.akadoma.InputJadwalSeminarTaActivity;
 import ta.syifaul.akadoma.InputJadwalSidangTaActivity;
+import ta.syifaul.akadoma.JadwalSeminarKpActivity;
 import ta.syifaul.akadoma.JadwalSeminarTaActivity;
 import ta.syifaul.akadoma.JadwalSidangTaActivity;
 import ta.syifaul.akadoma.R;
@@ -24,7 +26,7 @@ import ta.syifaul.akadoma.R;
 
 public class JadwalFragment extends Fragment {
 
-    LinearLayout btnSmTa, btnSdTa;
+    LinearLayout btnSmKp, btnSmTa, btnSdTa;
 
     FloatingActionButton fab;
 
@@ -52,8 +54,17 @@ public class JadwalFragment extends Fragment {
             }
         });
 
+        btnSmKp = (LinearLayout) rootView.findViewById(R.id.btn_jdwl_smkp);
         btnSmTa = (LinearLayout) rootView.findViewById(R.id.btn_jdwl_smta);
         btnSdTa = (LinearLayout) rootView.findViewById(R.id.btn_jdwl_sdta);
+
+        btnSmKp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), JadwalSeminarKpActivity.class);
+                startActivity(intent);
+            }
+        });
 
         btnSmTa.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,16 +86,19 @@ public class JadwalFragment extends Fragment {
     }
 
     private void tampilkanOpsi(){
-        final CharSequence[] dialogitem = {"Jadwal Seminar TA", "Jadwal Sidang TA"};
+        final CharSequence[] dialogitem = {"Jadwal Seminar KP", "Jadwal Seminar TA", "Jadwal Sidang TA"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Pilihan Input");
         builder.setItems(dialogitem, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
                 switch(item){
                     case 0 :
-                        startActivity(new Intent(getActivity(), InputJadwalSeminarTaActivity.class));
+                        startActivity(new Intent(getActivity(), InputJadwalSeminarKpActivity.class));
                         break;
                     case 1 :
+                        startActivity(new Intent(getActivity(), InputJadwalSeminarTaActivity.class));
+                        break;
+                    case 2 :
                         startActivity(new Intent(getActivity(), InputJadwalSidangTaActivity.class));
                         break;
                 }

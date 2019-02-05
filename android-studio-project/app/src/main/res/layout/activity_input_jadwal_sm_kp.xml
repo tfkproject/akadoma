@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="3dp"
+            card_view:cardUseCompatPadding="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <Button
+                    android:id="@+id/btn_tgl"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Set tanggal"
+                    android:layout_marginTop="20dp"/>
+
+                <Button
+                    android:id="@+id/btn_wkt"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Set waktu"
+                    android:layout_marginTop="20dp"/>
+
+                <EditText
+                    android:id="@+id/edt_ruangan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ruangan"
+                    android:inputType="textPersonName"/>
+
+                <AutoCompleteTextView
+                    android:id="@+id/edt_nama"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Nama"
+                    android:inputType="textPersonName"/>
+
+                <EditText
+                    android:id="@+id/edt_kelas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Kelas"
+                    android:inputType="textPersonName"/>
+
+                <EditText
+                    android:id="@+id/edt_jdl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Judul"
+                    android:inputType="textMultiLine"/>
+
+                <AutoCompleteTextView
+                    android:id="@+id/edt_pembimbing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Pembimbing"
+                    android:inputType="textPersonName"/>
+
+
+                <Button
+                    android:id="@+id/btn_simpan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Simpan"
+                    android:drawableLeft="@drawable/ic_save_black_24dp"
+                    android:layout_marginTop="20dp"/>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+
+    </LinearLayout>
+</ScrollView>

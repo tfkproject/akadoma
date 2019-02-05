@@ -43,10 +43,10 @@ import ta.syifaul.akadoma.util.Request;
 import ta.syifaul.akadoma.util.SessionManager;
 
 
-public class EditJadwalSeminarTaActivity extends AppCompatActivity {
+public class EditJadwalSeminarKpActivity extends AppCompatActivity {
 
     EditText edtKelas, edtJudul, edt_Ruangan;
-    AutoCompleteTextView edtNama, edt_Pembimbing1, edt_Pembimbing2, edt_Penguji1, edt_Penguji2;
+    AutoCompleteTextView edtNama, edt_Pembimbing;
     Button btnTgl, btnWaktu, btnUpdate;
 
     private ProgressDialog pDialog;
@@ -56,8 +56,8 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
     private List<String> list_mhs;
 
     SessionManager session;
-    private static String url = Config.HOST+"edit_jdw_sm_ta.php";
-    private static String url_dt_dosen_koor = Config.HOST+"data_dosen_koor.php";
+    private static String url = Config.HOST+"edit_jdw_sm_kp.php";
+    private static String url_dt_dosen_koor = Config.HOST+"data_dosen_koorkp.php";
     private static String url_dt_mhs = Config.HOST+"data_mhs.php";
 
     private Calendar kalender;
@@ -75,7 +75,7 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_jadwal_sm_ta);
 
-        getSupportActionBar().setTitle("Edit Data Seminar TA");
+        getSupportActionBar().setTitle("Edit Data Seminar KP");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final String id_jseminarta = getIntent().getStringExtra("key_id_jadwal");
@@ -85,10 +85,7 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         String nm = getIntent().getStringExtra("key_nama");
         String kls = getIntent().getStringExtra("key_kelas");
         String jdl = getIntent().getStringExtra("key_judul");
-        String pbb1 = getIntent().getStringExtra("key_pbb1");
-        String pbb2 = getIntent().getStringExtra("key_pbb2");
-        String pgj1 = getIntent().getStringExtra("key_pgj1");
-        String pgj2 = getIntent().getStringExtra("key_pgj2");
+        String pbb = getIntent().getStringExtra("key_pbb");
 
         // kalender
         kalender    = Calendar.getInstance();
@@ -103,10 +100,7 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         edtNama = (AutoCompleteTextView) findViewById(R.id.edt_nama);
         edtKelas = (EditText) findViewById(R.id.edt_kelas);
         edtJudul = (EditText) findViewById(R.id.edt_jdl);
-        edt_Pembimbing1 = (AutoCompleteTextView) findViewById(R.id.edt_pembimbing1);
-        edt_Pembimbing2 = (AutoCompleteTextView) findViewById(R.id.edt_pembimbing2);
-        edt_Penguji1 = (AutoCompleteTextView) findViewById(R.id.edt_penguji1);
-        edt_Penguji2 = (AutoCompleteTextView) findViewById(R.id.edt_penguji2);
+        edt_Pembimbing = (AutoCompleteTextView) findViewById(R.id.edt_pembimbing);
         edt_Ruangan = (EditText) findViewById(R.id.edt_ruangan);
         ///
 
@@ -119,10 +113,7 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         edtNama.setText(nm);
         edtKelas.setText(kls);
         edtJudul.setText(jdl);
-        edt_Pembimbing1.setText(pbb1);
-        edt_Pembimbing2.setText(pbb2);
-        edt_Penguji1.setText(pgj1);
-        edt_Penguji2.setText(pgj2);
+        edt_Pembimbing.setText(pbb);
         edt_Ruangan.setText(rgn);
 
         btnTgl.setOnClickListener(new View.OnClickListener() {
@@ -143,21 +134,18 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(tanggal == null){
-                    Toast.makeText(EditJadwalSeminarTaActivity.this, "Tanggal harus ditentukan", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditJadwalSeminarKpActivity.this, "Tanggal harus ditentukan", Toast.LENGTH_SHORT).show();
                 }
                 else if(waktu == null){
-                    Toast.makeText(EditJadwalSeminarTaActivity.this, "Waktu harus ditentukan", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditJadwalSeminarKpActivity.this, "Waktu harus ditentukan", Toast.LENGTH_SHORT).show();
                 }else {
                     String nama = edtNama.getText().toString();
                     String kelas = edtKelas.getText().toString();
                     String judul = edtJudul.getText().toString();
-                    String pbb1 = edt_Pembimbing1.getText().toString();
-                    String pbb2 = edt_Pembimbing2.getText().toString();
-                    String pgj1 = edt_Penguji1.getText().toString();
-                    String pgj2 = edt_Penguji2.getText().toString();
+                    String pbb = edt_Pembimbing.getText().toString();
                     String ruangan = edt_Ruangan.getText().toString();
 
-                    new prosesUpdate(id_jseminarta, nama, kelas, judul, pbb1, pbb2, pgj1, pgj2, ruangan, tanggal, waktu).execute();
+                    new prosesUpdate(id_jseminarta, nama, kelas, judul, pbb, ruangan, tanggal, waktu).execute();
                 }
             }
         });
@@ -208,29 +196,23 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         //variabel untuk tangkap data
         private int scs = 0;
         private String psn;
-        private String id_jseminarta, nama, kelas, judul, pembimbing1, pembimbing2, penguji1, penguji2, ruangan, tgl, waktu;
+        private String id_jseminarkp, nama, kelas, judul, pembimbing, ruangan, tgl, waktu;
 
         public prosesUpdate(
                 String id_jseminarta,
                 String nama,
                 String kelas,
                 String judul,
-                String pembimbing1,
-                String pembimbing2,
-                String penguji1,
-                String penguji2,
+                String pembimbing,
                 String ruangan,
                 String tgl,
                 String waktu
         ){
-            this.id_jseminarta = id_jseminarta;
+            this.id_jseminarkp = id_jseminarkp;
             this.nama = nama;
             this.kelas = kelas;
             this.judul = judul;
-            this.pembimbing1 = pembimbing1;
-            this.pembimbing2 = pembimbing2;
-            this.penguji1 = penguji1;
-            this.penguji2 = penguji2;
+            this.pembimbing = pembimbing;
             this.ruangan = ruangan;
             this.tgl = tgl;
             this.waktu = waktu;
@@ -239,7 +221,7 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(EditJadwalSeminarTaActivity.this);
+            pDialog = new ProgressDialog(EditJadwalSeminarKpActivity.this);
             pDialog.setMessage("Loading...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
@@ -251,14 +233,11 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
             try{
                 //susun parameter
                 HashMap<String,String> detail = new HashMap<>();
-                detail.put("id_jseminarta", id_jseminarta);
+                detail.put("id_jseminarkp", id_jseminarkp);
                 detail.put("nama", nama);
                 detail.put("kelas", kelas);
                 detail.put("judul", judul);
-                detail.put("pembimbing1", pembimbing1);
-                detail.put("pembimbing2", pembimbing2);
-                detail.put("penguji1", penguji1);
-                detail.put("penguji2", penguji2);
+                detail.put("pembimbing", pembimbing);
                 detail.put("ruangan", ruangan);
                 detail.put("tanggal", tgl);
                 detail.put("waktu", waktu);
@@ -297,12 +276,12 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             pDialog.dismiss();
             if(scs == 1){
-                Toast.makeText(EditJadwalSeminarTaActivity.this, psn, Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditJadwalSeminarKpActivity.this, psn, Toast.LENGTH_SHORT).show();
                 finish();
                 triggerAlarmManager();
             }
             else{
-                Toast.makeText(EditJadwalSeminarTaActivity.this, psn, Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditJadwalSeminarKpActivity.this, psn, Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -376,12 +355,12 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
                 String[] data_user = list_mhs.toArray(new String[list_mhs.size()]);
 
                 adapterMhs = new ArrayAdapter<String>
-                        (EditJadwalSeminarTaActivity.this, android.R.layout.select_dialog_item, data_user);
+                        (EditJadwalSeminarKpActivity.this, android.R.layout.select_dialog_item, data_user);
 
                 edtNama.setThreshold(1);
                 edtNama.setAdapter(adapterMhs);
             } else {
-                Toast.makeText(EditJadwalSeminarTaActivity.this, "Terjadi kesalahan saat memuat data dosen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditJadwalSeminarKpActivity.this, "Terjadi kesalahan saat memuat data dosen", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -397,7 +376,7 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(EditJadwalSeminarTaActivity.this);
+            pDialog = new ProgressDialog(EditJadwalSeminarKpActivity.this);
             pDialog.setMessage("Memuat data...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
@@ -456,21 +435,13 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
                 String[] data_user = list.toArray(new String[list.size()]);
 
                 adapter = new ArrayAdapter<String>
-                        (EditJadwalSeminarTaActivity.this, android.R.layout.select_dialog_item, data_user);
+                        (EditJadwalSeminarKpActivity.this, android.R.layout.select_dialog_item, data_user);
 
-                edt_Pembimbing1.setThreshold(1);
-                edt_Pembimbing1.setAdapter(adapter);
+                edt_Pembimbing.setThreshold(1);
+                edt_Pembimbing.setAdapter(adapter);
 
-                edt_Pembimbing2.setThreshold(1);
-                edt_Pembimbing2.setAdapter(adapter);
-
-                edt_Penguji1.setThreshold(1);
-                edt_Penguji1.setAdapter(adapter);
-
-                edt_Penguji2.setThreshold(1);
-                edt_Penguji2.setAdapter(adapter);
             } else {
-                Toast.makeText(EditJadwalSeminarTaActivity.this, "Terjadi kesalahan saat memuat data dosen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditJadwalSeminarKpActivity.this, "Terjadi kesalahan saat memuat data dosen", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -505,16 +476,16 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
 
     private void triggerAlarmManager(){
 
-        Intent alarmIntent = new Intent(EditJadwalSeminarTaActivity.this, AlarmReceiver.class);
+        Intent alarmIntent = new Intent(EditJadwalSeminarKpActivity.this, AlarmReceiver.class);
         alarmIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        pendingIntent = PendingIntent.getBroadcast(EditJadwalSeminarTaActivity.this, ALARM_REQUEST_CODE, alarmIntent, 0);
+        pendingIntent = PendingIntent.getBroadcast(EditJadwalSeminarKpActivity.this, ALARM_REQUEST_CODE, alarmIntent, 0);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         //simpan parameter ke memory
         SharedPreferences sharedPreferences = getSharedPreferences("key_alarm_agenda", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("judul", "Jadwal Seminar TA: "+edtNama.getText().toString());
+        editor.putString("judul", "Jadwal Seminar KP: "+edtNama.getText().toString());
         editor.putString("ket", "Judul: "+edtJudul.getText().toString()+", "+tanggal + " " + waktu + " WIB");
 
         /////parsing tanggal dan waktu////

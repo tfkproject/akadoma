@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -26,7 +27,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -36,6 +40,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import ta.syifaul.akadoma.util.AlarmReceiver;
 import ta.syifaul.akadoma.util.Config;
@@ -43,11 +48,14 @@ import ta.syifaul.akadoma.util.Request;
 import ta.syifaul.akadoma.util.SessionManager;
 
 
-public class EditJadwalSeminarTaActivity extends AppCompatActivity {
+public class InputJadwalSeminarKpActivity extends AppCompatActivity {
+
+    private PendingIntent pendingIntent;
+    private static final int ALARM_REQUEST_CODE = 133;
 
     EditText edtKelas, edtJudul, edt_Ruangan;
-    AutoCompleteTextView edtNama, edt_Pembimbing1, edt_Pembimbing2, edt_Penguji1, edt_Penguji2;
-    Button btnTgl, btnWaktu, btnUpdate;
+    AutoCompleteTextView edtNama, edt_Pembimbing;
+    Button btnTgl, btnWaktu, btnSimpan;
 
     private ProgressDialog pDialog;
     private ArrayAdapter<String> adapter;
@@ -56,8 +64,8 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
     private List<String> list_mhs;
 
     SessionManager session;
-    private static String url = Config.HOST+"edit_jdw_sm_ta.php";
-    private static String url_dt_dosen_koor = Config.HOST+"data_dosen_koor.php";
+    private static String url = Config.HOST+"input_jdw_sm_kp.php";
+    private static String url_dt_dosen_koor = Config.HOST+"data_dosen_koorkp.php";
     private static String url_dt_mhs = Config.HOST+"data_mhs.php";
 
     private Calendar kalender;
@@ -67,28 +75,16 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
     static final int TIME_DIALOG = 2;
     private String tanggal, waktu;
 
-    private PendingIntent pendingIntent;
-    private static final int ALARM_REQUEST_CODE = 133;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_jadwal_sm_ta);
+        setContentView(R.layout.activity_input_jadwal_sm_kp);
 
-        getSupportActionBar().setTitle("Edit Data Seminar TA");
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        getSupportActionBar().setTitle("Input Data Seminar KP");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        final String id_jseminarta = getIntent().getStringExtra("key_id_jadwal");
-        tanggal = getIntent().getStringExtra("key_tanggal");
-        waktu = getIntent().getStringExtra("key_waktu");
-        String rgn = getIntent().getStringExtra("key_ruang");
-        String nm = getIntent().getStringExtra("key_nama");
-        String kls = getIntent().getStringExtra("key_kelas");
-        String jdl = getIntent().getStringExtra("key_judul");
-        String pbb1 = getIntent().getStringExtra("key_pbb1");
-        String pbb2 = getIntent().getStringExtra("key_pbb2");
-        String pgj1 = getIntent().getStringExtra("key_pgj1");
-        String pgj2 = getIntent().getStringExtra("key_pgj2");
 
         // kalender
         kalender    = Calendar.getInstance();
@@ -103,27 +99,13 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         edtNama = (AutoCompleteTextView) findViewById(R.id.edt_nama);
         edtKelas = (EditText) findViewById(R.id.edt_kelas);
         edtJudul = (EditText) findViewById(R.id.edt_jdl);
-        edt_Pembimbing1 = (AutoCompleteTextView) findViewById(R.id.edt_pembimbing1);
-        edt_Pembimbing2 = (AutoCompleteTextView) findViewById(R.id.edt_pembimbing2);
-        edt_Penguji1 = (AutoCompleteTextView) findViewById(R.id.edt_penguji1);
-        edt_Penguji2 = (AutoCompleteTextView) findViewById(R.id.edt_penguji2);
+        edt_Pembimbing = (AutoCompleteTextView) findViewById(R.id.edt_pembimbing);
         edt_Ruangan = (EditText) findViewById(R.id.edt_ruangan);
         ///
 
         btnWaktu = (Button) findViewById(R.id.btn_wkt);
         btnTgl = (Button) findViewById(R.id.btn_tgl);
-        btnUpdate = (Button) findViewById(R.id.btn_update);
-
-        btnTgl.setText(tanggal);
-        btnWaktu.setText(waktu);
-        edtNama.setText(nm);
-        edtKelas.setText(kls);
-        edtJudul.setText(jdl);
-        edt_Pembimbing1.setText(pbb1);
-        edt_Pembimbing2.setText(pbb2);
-        edt_Penguji1.setText(pgj1);
-        edt_Penguji2.setText(pgj2);
-        edt_Ruangan.setText(rgn);
+        btnSimpan = (Button) findViewById(R.id.btn_simpan);
 
         btnTgl.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,25 +121,22 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
             }
         });
 
-        btnUpdate.setOnClickListener(new View.OnClickListener() {
+        btnSimpan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(tanggal == null){
-                    Toast.makeText(EditJadwalSeminarTaActivity.this, "Tanggal harus ditentukan", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(InputJadwalSeminarKpActivity.this, "Tanggal harus ditentukan", Toast.LENGTH_SHORT).show();
                 }
                 else if(waktu == null){
-                    Toast.makeText(EditJadwalSeminarTaActivity.this, "Waktu harus ditentukan", Toast.LENGTH_SHORT).show();
-                }else {
+                    Toast.makeText(InputJadwalSeminarKpActivity.this, "Waktu harus ditentukan", Toast.LENGTH_SHORT).show();
+                }else{
                     String nama = edtNama.getText().toString();
                     String kelas = edtKelas.getText().toString();
                     String judul = edtJudul.getText().toString();
-                    String pbb1 = edt_Pembimbing1.getText().toString();
-                    String pbb2 = edt_Pembimbing2.getText().toString();
-                    String pgj1 = edt_Penguji1.getText().toString();
-                    String pgj2 = edt_Penguji2.getText().toString();
+                    String pbb = edt_Pembimbing.getText().toString();
                     String ruangan = edt_Ruangan.getText().toString();
 
-                    new prosesUpdate(id_jseminarta, nama, kelas, judul, pbb1, pbb2, pgj1, pgj2, ruangan, tanggal, waktu).execute();
+                    new prosesSimpan(nama, kelas, judul, pbb, ruangan, tanggal, waktu).execute();
                 }
             }
         });
@@ -203,34 +182,26 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         }
     };
 
-    private class prosesUpdate extends AsyncTask<Void,Void,String> {
+    private class prosesSimpan extends AsyncTask<Void,Void,String> {
 
         //variabel untuk tangkap data
         private int scs = 0;
         private String psn;
-        private String id_jseminarta, nama, kelas, judul, pembimbing1, pembimbing2, penguji1, penguji2, ruangan, tgl, waktu;
+        private String nama, kelas, judul, pembimbing, ruangan, tgl, waktu;
 
-        public prosesUpdate(
-                String id_jseminarta,
+        public prosesSimpan(
                 String nama,
                 String kelas,
                 String judul,
-                String pembimbing1,
-                String pembimbing2,
-                String penguji1,
-                String penguji2,
+                String pembimbing,
                 String ruangan,
                 String tgl,
                 String waktu
         ){
-            this.id_jseminarta = id_jseminarta;
             this.nama = nama;
             this.kelas = kelas;
             this.judul = judul;
-            this.pembimbing1 = pembimbing1;
-            this.pembimbing2 = pembimbing2;
-            this.penguji1 = penguji1;
-            this.penguji2 = penguji2;
+            this.pembimbing = pembimbing;
             this.ruangan = ruangan;
             this.tgl = tgl;
             this.waktu = waktu;
@@ -239,7 +210,7 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(EditJadwalSeminarTaActivity.this);
+            pDialog = new ProgressDialog(InputJadwalSeminarKpActivity.this);
             pDialog.setMessage("Loading...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
@@ -251,14 +222,10 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
             try{
                 //susun parameter
                 HashMap<String,String> detail = new HashMap<>();
-                detail.put("id_jseminarta", id_jseminarta);
                 detail.put("nama", nama);
                 detail.put("kelas", kelas);
                 detail.put("judul", judul);
-                detail.put("pembimbing1", pembimbing1);
-                detail.put("pembimbing2", pembimbing2);
-                detail.put("penguji1", penguji1);
-                detail.put("penguji2", penguji2);
+                detail.put("pembimbing", pembimbing);
                 detail.put("ruangan", ruangan);
                 detail.put("tanggal", tgl);
                 detail.put("waktu", waktu);
@@ -297,12 +264,17 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             pDialog.dismiss();
             if(scs == 1){
-                Toast.makeText(EditJadwalSeminarTaActivity.this, psn, Toast.LENGTH_SHORT).show();
+                Toast.makeText(InputJadwalSeminarKpActivity.this, psn, Toast.LENGTH_SHORT).show();
                 finish();
+                Intent intent = new Intent(InputJadwalSeminarKpActivity.this, JadwalSeminarTaActivity.class);
+                startActivity(intent);
+                //set alarm
                 triggerAlarmManager();
+                //buat notifikasi
+                buatNotifikasi(judul);
             }
             else{
-                Toast.makeText(EditJadwalSeminarTaActivity.this, psn, Toast.LENGTH_SHORT).show();
+                Toast.makeText(InputJadwalSeminarKpActivity.this, psn, Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -376,12 +348,12 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
                 String[] data_user = list_mhs.toArray(new String[list_mhs.size()]);
 
                 adapterMhs = new ArrayAdapter<String>
-                        (EditJadwalSeminarTaActivity.this, android.R.layout.select_dialog_item, data_user);
+                        (InputJadwalSeminarKpActivity.this, android.R.layout.select_dialog_item, data_user);
 
                 edtNama.setThreshold(1);
                 edtNama.setAdapter(adapterMhs);
             } else {
-                Toast.makeText(EditJadwalSeminarTaActivity.this, "Terjadi kesalahan saat memuat data dosen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(InputJadwalSeminarKpActivity.this, "Terjadi kesalahan saat memuat data dosen", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -397,7 +369,7 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(EditJadwalSeminarTaActivity.this);
+            pDialog = new ProgressDialog(InputJadwalSeminarKpActivity.this);
             pDialog.setMessage("Memuat data...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
@@ -456,21 +428,13 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
                 String[] data_user = list.toArray(new String[list.size()]);
 
                 adapter = new ArrayAdapter<String>
-                        (EditJadwalSeminarTaActivity.this, android.R.layout.select_dialog_item, data_user);
+                        (InputJadwalSeminarKpActivity.this, android.R.layout.select_dialog_item, data_user);
 
-                edt_Pembimbing1.setThreshold(1);
-                edt_Pembimbing1.setAdapter(adapter);
+                edt_Pembimbing.setThreshold(1);
+                edt_Pembimbing.setAdapter(adapter);
 
-                edt_Pembimbing2.setThreshold(1);
-                edt_Pembimbing2.setAdapter(adapter);
-
-                edt_Penguji1.setThreshold(1);
-                edt_Penguji1.setAdapter(adapter);
-
-                edt_Penguji2.setThreshold(1);
-                edt_Penguji2.setAdapter(adapter);
             } else {
-                Toast.makeText(EditJadwalSeminarTaActivity.this, "Terjadi kesalahan saat memuat data dosen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(InputJadwalSeminarKpActivity.this, "Terjadi kesalahan saat memuat data dosen", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -503,11 +467,62 @@ public class EditJadwalSeminarTaActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void buatNotifikasi(String judul){
+        try {
+            String jsonResponse;
+
+            URL url = new URL("https://onesignal.com/api/v1/notifications");
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setUseCaches(false);
+            con.setDoOutput(true);
+            con.setDoInput(true);
+
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setRequestProperty("Authorization", "Basic ZDQ5NGZkNTAtZTQ1Mi00MDkzLThhYTItNjE1YzE4ZDUzNmRk");
+            con.setRequestMethod("POST");
+
+            String strJsonBody = "{"
+                    +   "\"app_id\": \"b7f49fad-d107-4484-b905-f11d02f670a8\","
+                    +   "\"included_segments\": [\"All\"],"
+                    +   "\"data\": {\"foo\": \"bar\"},"
+                    +   "\"contents\": {\"en\": \"Jadwal Seminar: "+judul+"\"}"
+                    + "}";
+
+
+            System.out.println("strJsonBody:\n" + strJsonBody);
+
+            byte[] sendBytes = strJsonBody.getBytes("UTF-8");
+            con.setFixedLengthStreamingMode(sendBytes.length);
+
+            OutputStream outputStream = con.getOutputStream();
+            outputStream.write(sendBytes);
+
+            int httpResponse = con.getResponseCode();
+            System.out.println("httpResponse: " + httpResponse);
+
+            if (  httpResponse >= HttpURLConnection.HTTP_OK
+                    && httpResponse < HttpURLConnection.HTTP_BAD_REQUEST) {
+                Scanner scanner = new Scanner(con.getInputStream(), "UTF-8");
+                jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                scanner.close();
+            }
+            else {
+                Scanner scanner = new Scanner(con.getErrorStream(), "UTF-8");
+                jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                scanner.close();
+            }
+            System.out.println("jsonResponse:\n" + jsonResponse);
+
+        } catch(Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
     private void triggerAlarmManager(){
 
-        Intent alarmIntent = new Intent(EditJadwalSeminarTaActivity.this, AlarmReceiver.class);
+        Intent alarmIntent = new Intent(InputJadwalSeminarKpActivity.this, AlarmReceiver.class);
         alarmIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        pendingIntent = PendingIntent.getBroadcast(EditJadwalSeminarTaActivity.this, ALARM_REQUEST_CODE, alarmIntent, 0);
+        pendingIntent = PendingIntent.getBroadcast(InputJadwalSeminarKpActivity.this, ALARM_REQUEST_CODE, alarmIntent, 0);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 

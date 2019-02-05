@@ -26,14 +26,17 @@
         <activity android:name=".LoginActivity"/>
         <activity android:name=".PengumumanDetailActivity"/>
         <activity android:name=".AgendaDetailActivity"/>
+        <activity android:name=".JadwalSeminarKpActivity"/>
         <activity android:name=".JadwalSeminarTaActivity"/>
         <activity android:name=".JadwalSidangTaActivity"/>
         <activity android:name=".InputAgendaActivity"/>
         <activity android:name=".InputPengumumanActivity"/>
+        <activity android:name=".InputJadwalSeminarKpActivity"/>
         <activity android:name=".InputJadwalSeminarTaActivity"/>
         <activity android:name=".InputJadwalSidangTaActivity"/>
         <activity android:name=".EditAgendaActivity"/>
         <activity android:name=".EditPengumumanActivity"/>
+        <activity android:name=".EditJadwalSeminarKpActivity"/>
         <activity android:name=".EditJadwalSeminarTaActivity"/>
         <activity android:name=".EditJadwalSidangTaActivity"/>
         <activity android:name=".ProfileActivity"/>
