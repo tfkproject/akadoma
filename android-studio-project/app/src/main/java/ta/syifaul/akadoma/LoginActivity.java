@@ -58,6 +58,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         categories.add("Pilih login");
         categories.add("Mahasiwa");
         categories.add("Dosen");
+        categories.add("Koordinator KP");
         categories.add("Koordinator TA");
 
         // Creating adapter for spinner
@@ -89,8 +90,13 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                         break; // optional
 
                     case 3 :
-                        new prosesLogin(id, pass, "koor").execute();
+                        new prosesLogin(id, pass, "koorkp").execute();
                         break; // optional
+
+                    case 4 :
+                        new prosesLogin(id, pass, "koorta").execute();
+                        break; // optional
+
                     default : // Optional
                         Toast.makeText(LoginActivity.this, "Pilih login anda", Toast.LENGTH_SHORT).show();
                 }
@@ -114,6 +120,10 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                 break; // optional
 
             case 3 :
+                edtId.setHint("NIP");
+                break;
+
+            case 4 :
                 edtId.setHint("NIP");
                 break;
 
@@ -167,7 +177,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                     String response = Request.post(url, dataToSend);
 
                     //dapatkan respon
-                    Log.e("NIM", no_id);
+                    Log.e("no_id", no_id);
                     Log.e("Pass", password);
                     Log.e("Level", level);
                     Log.e("Url", url);

@@ -47,7 +47,7 @@ public class JadwalSeminarKpAdapter extends RecyclerView.Adapter<JadwalSeminarKp
         HashMap<String, String> user = session.getUserDetails();
         String level = user.get(SessionManager.KEY_LEVEL);
 
-        if(level.contains("koor")){
+        if(level.contains("koorkp")){
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

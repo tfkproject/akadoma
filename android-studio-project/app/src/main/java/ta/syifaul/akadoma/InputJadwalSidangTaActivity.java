@@ -65,7 +65,7 @@ public class InputJadwalSidangTaActivity extends AppCompatActivity {
 
     SessionManager session;
     private static String url = Config.HOST+"input_jdw_sd_ta.php";
-    private static String url_dt_dosen_koor = Config.HOST+"data_dosen_koor.php";
+    private static String url_dt_dosen_koor = Config.HOST+"data_dosen.php";
     private static String url_dt_mhs = Config.HOST+"data_mhs.php";
 
     private Calendar kalender;

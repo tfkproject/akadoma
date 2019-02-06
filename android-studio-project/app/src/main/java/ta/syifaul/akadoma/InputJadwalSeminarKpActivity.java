@@ -65,7 +65,7 @@ public class InputJadwalSeminarKpActivity extends AppCompatActivity {
 
     SessionManager session;
     private static String url = Config.HOST+"input_jdw_sm_kp.php";
-    private static String url_dt_dosen_koor = Config.HOST+"data_dosen_koorkp.php";
+    private static String url_dt_dosen_koor = Config.HOST+"data_dosen.php";
     private static String url_dt_mhs = Config.HOST+"data_mhs.php";
 
     private Calendar kalender;

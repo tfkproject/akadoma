@@ -35,7 +35,7 @@ public class JadwalFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_ly_jadwal, container, false);
 
-        String level_ = getActivity().getIntent().getStringExtra("level");
+        final String level_ = getActivity().getIntent().getStringExtra("level");
 
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         if(level_.contains("mhs")){
@@ -44,13 +44,21 @@ public class JadwalFragment extends Fragment {
         if(level_.contains("dsn")){
             fab.setVisibility(View.GONE);
         }
-        if(level_.contains("koor")){
+        if(level_.contains("koorta")){
+            fab.setVisibility(View.VISIBLE);
+        }
+        if(level_.contains("koorkp")){
             fab.setVisibility(View.VISIBLE);
         }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tampilkanOpsi();
+                if(level_.contains("koorta")){
+                    tampilkanOpsiTA();
+                }
+                if(level_.contains("koorkp")){
+                    tampilkanOpsiKP();
+                }
             }
         });
 
@@ -85,8 +93,27 @@ public class JadwalFragment extends Fragment {
         return rootView;
     }
 
-    private void tampilkanOpsi(){
-        final CharSequence[] dialogitem = {"Jadwal Seminar KP", "Jadwal Seminar TA", "Jadwal Sidang TA"};
+    private void tampilkanOpsiTA(){
+        final CharSequence[] dialogitem = {"Jadwal Seminar TA", "Jadwal Sidang TA"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Pilihan Input");
+        builder.setItems(dialogitem, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                switch(item){
+                    case 0 :
+                        startActivity(new Intent(getActivity(), InputJadwalSeminarTaActivity.class));
+                        break;
+                    case 1 :
+                        startActivity(new Intent(getActivity(), InputJadwalSidangTaActivity.class));
+                        break;
+                }
+            }
+        });
+        builder.create().show();
+    }
+
+    private void tampilkanOpsiKP(){
+        final CharSequence[] dialogitem = {"Jadwal Seminar KP"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Pilihan Input");
         builder.setItems(dialogitem, new DialogInterface.OnClickListener() {
@@ -94,12 +121,6 @@ public class JadwalFragment extends Fragment {
                 switch(item){
                     case 0 :
                         startActivity(new Intent(getActivity(), InputJadwalSeminarKpActivity.class));
-                        break;
-                    case 1 :
-                        startActivity(new Intent(getActivity(), InputJadwalSeminarTaActivity.class));
-                        break;
-                    case 2 :
-                        startActivity(new Intent(getActivity(), InputJadwalSidangTaActivity.class));
                         break;
                 }
             }
