@@ -5,7 +5,7 @@ $response = array();
 require 'koneksi.php';
 $id_user = $_POST['id_user'];
 
-if($result = $db->query("SELECT * FROM user WHERE level = 'dsn' OR level = 'koor' ORDER BY nama ASC")){
+if($result = $db->query("SELECT * FROM user WHERE level = 'dsn' OR level = 'koorta' OR level = 'koorkp' GROUP BY no_identitas ORDER BY nama ASC")){
 	if($count = $result->num_rows){
 		$response["field"] = array();
 		
