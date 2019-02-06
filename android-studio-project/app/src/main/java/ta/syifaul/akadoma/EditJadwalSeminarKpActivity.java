@@ -73,12 +73,12 @@ public class EditJadwalSeminarKpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_jadwal_sm_ta);
+        setContentView(R.layout.activity_edit_jadwal_sm_kp);
 
         getSupportActionBar().setTitle("Edit Data Seminar KP");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final String id_jseminarta = getIntent().getStringExtra("key_id_jadwal");
+        final String id_jseminarkp = getIntent().getStringExtra("key_id_jadwal");
         tanggal = getIntent().getStringExtra("key_tanggal");
         waktu = getIntent().getStringExtra("key_waktu");
         String rgn = getIntent().getStringExtra("key_ruang");
@@ -145,7 +145,7 @@ public class EditJadwalSeminarKpActivity extends AppCompatActivity {
                     String pbb = edt_Pembimbing.getText().toString();
                     String ruangan = edt_Ruangan.getText().toString();
 
-                    new prosesUpdate(id_jseminarta, nama, kelas, judul, pbb, ruangan, tanggal, waktu).execute();
+                    new prosesUpdate(id_jseminarkp, nama, kelas, judul, pbb, ruangan, tanggal, waktu).execute();
                 }
             }
         });
