@@ -199,7 +199,7 @@ public class EditJadwalSeminarKpActivity extends AppCompatActivity {
         private String id_jseminarkp, nama, kelas, judul, pembimbing, ruangan, tgl, waktu;
 
         public prosesUpdate(
-                String id_jseminarta,
+                String id_jseminarkp,
                 String nama,
                 String kelas,
                 String judul,
