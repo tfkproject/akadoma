@@ -18,6 +18,8 @@ if($result = $db->query("SELECT * FROM `jadwal_seminarkp` ORDER BY id_jseminarkp
 			$data["ruangan"] = $row->ruangan;			
 			$data["tanggal"] = $row->tanggal;
 			$data["waktu"] = $row->waktu;
+			
+			date_default_timezone_set("Asia/Jakarta");
 
 			$time = date_parse ($row->tanggal." ".$row->waktu);
 			
