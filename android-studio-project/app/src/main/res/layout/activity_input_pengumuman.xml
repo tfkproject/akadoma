@@ -41,14 +41,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:hint="Set tanggal"
-                    android:layout_marginTop="20dp"/>
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/btn_wkt"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:hint="Set waktu"
-                    android:layout_marginTop="20dp"/>
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/btn_update"

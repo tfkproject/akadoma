@@ -105,6 +105,8 @@ public class InputPengumumanActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(edtJudul.getText().toString().length() > 0 && edtKeterangan.getText().toString().length() > 0){
+                    tanggal = "0000-00-00";
+                    waktu = "00:00:00";
                     if(tanggal == null){
                         Toast.makeText(InputPengumumanActivity.this, "Tanggal harus ditentukan", Toast.LENGTH_SHORT).show();
                     }
@@ -130,7 +132,10 @@ public class InputPengumumanActivity extends AppCompatActivity {
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case DATE_DIALOG:
-                return new DatePickerDialog(this, datePickerListener, tahun, bulan, hari);
+                DatePickerDialog pdp = new DatePickerDialog(this, datePickerListener, tahun, bulan, hari);
+                pdp.getDatePicker().setMinDate(System.currentTimeMillis());
+                return pdp;
+            //return new DatePickerDialog(this, datePickerListener, tahun, bulan, hari);
 
             case TIME_DIALOG:
                 return new TimePickerDialog(this, timePickerListener, jam, menit, false);
