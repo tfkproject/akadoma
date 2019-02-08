@@ -44,6 +44,7 @@ import java.util.Scanner;
 
 import ta.syifaul.akadoma.util.AlarmReceiver;
 import ta.syifaul.akadoma.util.Config;
+import ta.syifaul.akadoma.util.RangeTimePickerDialog;
 import ta.syifaul.akadoma.util.Request;
 import ta.syifaul.akadoma.util.SessionManager;
 
@@ -158,7 +159,10 @@ public class InputJadwalSeminarKpActivity extends AppCompatActivity {
                 //return new DatePickerDialog(this, datePickerListener, tahun, bulan, hari);
 
             case TIME_DIALOG:
-                return new TimePickerDialog(this, timePickerListener, jam, menit, false);
+                RangeTimePickerDialog rtdp = new RangeTimePickerDialog(this, timePickerListener, jam, menit, true);
+                rtdp.setMin(jam, menit);
+                return rtdp;
+                //return new TimePickerDialog(this, timePickerListener, jam, menit, false);
         }
         return null;
     }
