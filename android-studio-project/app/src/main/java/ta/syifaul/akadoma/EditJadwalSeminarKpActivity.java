@@ -168,10 +168,10 @@ public class EditJadwalSeminarKpActivity extends AppCompatActivity {
                 //return new DatePickerDialog(this, datePickerListener, tahun, bulan, hari);
 
             case TIME_DIALOG:
-                RangeTimePickerDialog rtdp = new RangeTimePickerDialog(this, timePickerListener, jam, menit, true);
-                rtdp.setMin(jam, menit);
-                return rtdp;
-                //return new TimePickerDialog(this, timePickerListener, jam, menit, false);
+//                RangeTimePickerDialog rtdp = new RangeTimePickerDialog(this, timePickerListener, jam, menit, true);
+//                rtdp.setMin(jam, menit);
+//                return rtdp;
+                return new TimePickerDialog(this, timePickerListener, jam, menit, true);
         }
         return null;
     }
