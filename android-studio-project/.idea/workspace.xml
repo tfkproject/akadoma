@@ -43,8 +43,8 @@
       <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/ta/syifaul/akadoma/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="216" column="75" selection-start-line="216" selection-start-column="75" selection-end-line="216" selection-end-column="75" />
+            <state relative-caret-position="206">
+              <caret line="133" column="15" lean-forward="true" selection-start-line="133" selection-start-column="15" selection-end-line="133" selection-end-column="15" />
               <folding>
                 <element signature="class#prosesLogout#0;class#MainActivity#0" />
                 <element signature="e#5097#5098#0" expanded="true" />
@@ -2647,6 +2647,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1280" height="734" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="Android Profiler" order="7" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -3074,8 +3075,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/ta/syifaul/akadoma/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="216" column="75" selection-start-line="216" selection-start-column="75" selection-end-line="216" selection-end-column="75" />
+        <state relative-caret-position="206">
+          <caret line="133" column="15" lean-forward="true" selection-start-line="133" selection-start-column="15" selection-end-line="133" selection-end-column="15" />
           <folding>
             <element signature="class#prosesLogout#0;class#MainActivity#0" />
             <element signature="e#5097#5098#0" expanded="true" />
