@@ -14,6 +14,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.onesignal.OSPermissionSubscriptionState;
+import com.onesignal.OneSignal;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,11 +42,15 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
     SessionManager session;
     private static String url = Config.HOST+"user_login.php";
+    private String playerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
+        playerId = status.getSubscriptionStatus().getUserId();
 
         session = new SessionManager(LoginActivity.this);
 
@@ -80,26 +87,31 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             public void onClick(View view) {
                 String id = edtId.getText().toString();
                 String pass = edtPass.getText().toString();
-                switch(posisi) {
-                    case 1 :
-                        new prosesLogin(id, pass, "mhs").execute();
-                        break; // optional
+                if(playerId.isEmpty() || playerId.equals("") || playerId == null){
+                    Toast.makeText(LoginActivity.this, "Maaf, terjadi kesalahan. Silakan tutup terlebih dahulu aplikasi dan coba lagi", Toast.LENGTH_LONG).show();
+                }else{
+                    switch(posisi) {
+                        case 1 :
+                            new prosesLogin(id, pass, "mhs", playerId).execute();
+                            break; // optional
 
-                    case 2 :
-                        new prosesLogin(id, pass, "dsn").execute();
-                        break; // optional
+                        case 2 :
+                            new prosesLogin(id, pass, "dsn", playerId).execute();
+                            break; // optional
 
-                    case 3 :
-                        new prosesLogin(id, pass, "koorkp").execute();
-                        break; // optional
+                        case 3 :
+                            new prosesLogin(id, pass, "koorkp", playerId).execute();
+                            break; // optional
 
-                    case 4 :
-                        new prosesLogin(id, pass, "koorta").execute();
-                        break; // optional
+                        case 4 :
+                            new prosesLogin(id, pass, "koorta", playerId).execute();
+                            break; // optional
 
-                    default : // Optional
-                        Toast.makeText(LoginActivity.this, "Pilih login anda", Toast.LENGTH_SHORT).show();
+                        default : // Optional
+                            Toast.makeText(LoginActivity.this, "Pilih login anda", Toast.LENGTH_SHORT).show();
+                    }
                 }
+
             }
         });
     }
@@ -143,12 +155,13 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         //variabel untuk tangkap data
         private int scs = 0;
         private String psn;
-        private String no_id, password, level, level_;
+        private String no_id, password, level, level_, player_id;
 
-        public prosesLogin(String no_id, String password, String level){
+        public prosesLogin(String no_id, String password, String level, String player_id){
             this.no_id = no_id;
             this.password = password;
             this.level = level;
+            this.player_id = player_id;
         }
 
         @Override
@@ -169,6 +182,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                 detail.put("no_id", no_id);
                 detail.put("pass", password);
                 detail.put("level", level);
+                detail.put("player_id", player_id);
 
                 try {
                     //convert this HashMap to encodedUrl to send to php file
