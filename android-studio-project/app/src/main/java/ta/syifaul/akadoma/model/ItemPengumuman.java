@@ -5,7 +5,7 @@ package ta.syifaul.akadoma.model;
  */
 
 public class ItemPengumuman {
-    String id_pengumuman, id_user, nama, judul, tanggal, waktu, keterangan, level;
+    String id_pengumuman, id_user, nama, judul, tanggal, waktu, keterangan, level, tujuan;
 
     public ItemPengumuman(String id_pengumuman,
                           String id_user,
@@ -14,7 +14,8 @@ public class ItemPengumuman {
                           String tanggal,
                           String waktu,
                           String keterangan,
-                          String level){
+                          String level,
+                          String tujuan){
         this.id_pengumuman = id_pengumuman;
         this.id_user = id_user;
         this.nama = nama;
@@ -23,6 +24,7 @@ public class ItemPengumuman {
         this.waktu = waktu;
         this.keterangan = keterangan;
         this.level = level;
+        this.tujuan = tujuan;
     }
 
     public String getId_pengumuman() {
@@ -55,5 +57,9 @@ public class ItemPengumuman {
 
     public String getLevel() {
         return level;
+    }
+
+    public String getTujuan() {
+        return tujuan;
     }
 }

@@ -11,9 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -27,8 +30,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -37,10 +42,11 @@ import ta.syifaul.akadoma.util.Request;
 import ta.syifaul.akadoma.util.SessionManager;
 
 
-public class InputPengumumanActivity extends AppCompatActivity {
+public class InputPengumumanActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     EditText edtJudul, edtKeterangan;
     Button btnTgl, btnWaktu, btnSimpan;
+    int posisi = 0;
 
     private ProgressDialog pDialog;
 
@@ -83,6 +89,30 @@ public class InputPengumumanActivity extends AppCompatActivity {
         edtJudul = (EditText) findViewById(R.id.edt_jdl);
         edtKeterangan = (EditText) findViewById(R.id.edt_ket);
 
+        // Spinner element
+        Spinner spinner = (Spinner) findViewById(R.id.tujuan);
+
+        // Spinner click listener
+        spinner.setOnItemSelectedListener(InputPengumumanActivity.this);
+
+        // Spinner Drop down elements
+        List<String> categories = new ArrayList<String>();
+        categories.add("Pilih tujuan");
+        categories.add("Mahasiwa");
+        categories.add("Dosen");
+        categories.add("Koordinator KP");
+        categories.add("Koordinator TA");
+        categories.add("Semua");
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
+
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);
+
         btnWaktu = (Button) findViewById(R.id.btn_wkt);
         btnTgl = (Button) findViewById(R.id.btn_tgl);
         btnSimpan = (Button) findViewById(R.id.btn_update);
@@ -117,7 +147,32 @@ public class InputPengumumanActivity extends AppCompatActivity {
                         String judul = edtJudul.getText().toString();
                         String ket = edtKeterangan.getText().toString();
 
-                        new prosesSimpan(id_user, judul, ket, tanggal, waktu).execute();
+                        ///
+                        switch(posisi) {
+                            case 1 :
+                                new prosesSimpan(id_user, judul, ket, tanggal, waktu, "mhs").execute();
+                                break; // optional
+
+                            case 2 :
+                                new prosesSimpan(id_user, judul, ket, tanggal, waktu, "dsn").execute();
+                                break; // optional
+
+                            case 3 :
+                                new prosesSimpan(id_user, judul, ket, tanggal, waktu, "koorkp").execute();
+                                break; // optional
+
+                            case 4 :
+                                new prosesSimpan(id_user, judul, ket, tanggal, waktu, "koorta").execute();
+                                break; // optional
+
+                            case 5 :
+                                new prosesSimpan(id_user, judul, ket, tanggal, waktu, "sma").execute();
+                                break; // optional
+
+                            default : // Optional
+                                Toast.makeText(InputPengumumanActivity.this, "Pilih tujuan pengumuman", Toast.LENGTH_SHORT).show();
+                        }
+                        ///
                     }
                 }
                 else{
@@ -125,6 +180,44 @@ public class InputPengumumanActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // On selecting a spinner item
+        String item = parent.getItemAtPosition(position).toString();
+        posisi = position;
+
+//        switch(posisi) {
+//            case 1 :
+//                edtId.setHint("NIM");
+//                break; // optional
+//
+//            case 2 :
+//                edtId.setHint("NIP");
+//                break; // optional
+//
+//            case 3 :
+//                edtId.setHint("NIP");
+//                break;
+//
+//            case 4 :
+//                edtId.setHint("NIP");
+//                break;
+//
+//            case 5 :
+//                edtId.setHint("NIP");
+//                break;
+//
+//            default : // Optional
+//                edtId.setHint("- Pilih login anda -");
+//        }
+
+        // Showing selected spinner item
+        //Toast.makeText(parent.getContext(), "Selected: " + position, Toast.LENGTH_LONG).show();
+    }
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
     }
 
     @Override
@@ -167,14 +260,15 @@ public class InputPengumumanActivity extends AppCompatActivity {
         //variabel untuk tangkap data
         private int scs = 0;
         private String psn;
-        private String id_user, judul, ket, tgl, waktu;
+        private String id_user, judul, ket, tgl, waktu, tujuan;
 
-        public prosesSimpan(String id_user, String judul, String ket, String tgl, String waktu){
+        public prosesSimpan(String id_user, String judul, String ket, String tgl, String waktu, String tujuan){
             this.id_user = id_user;
             this.judul = judul;
             this.ket = ket;
             this.tgl = tgl;
             this.waktu = waktu;
+            this.tujuan = tujuan;
         }
 
         @Override
@@ -197,6 +291,7 @@ public class InputPengumumanActivity extends AppCompatActivity {
                 detail.put("keterangan", ket);
                 detail.put("tanggal", tgl);
                 detail.put("waktu", waktu);
+                detail.put("tujuan", tujuan);
 
                 try {
                     //convert this HashMap to encodedUrl to send to php file

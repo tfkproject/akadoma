@@ -5,12 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -29,7 +26,7 @@ import ta.syifaul.akadoma.util.Config;
 import ta.syifaul.akadoma.util.Request;
 import ta.syifaul.akadoma.util.SessionManager;
 
-public class PengumumanDetailActivity extends AppCompatActivity {
+public class PengumumanDetailTerkirimActivity extends AppCompatActivity {
 
     private TextView txtJudul, txtTanggal, txtWaktu, txtKeterangan, txtNama, txtjabatan, txtTujuan;
     private Button btnHapus, btnEdit;
@@ -42,9 +39,9 @@ public class PengumumanDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pengumuman_detail);
+        setContentView(R.layout.activity_pengumuman_detail_terkirim);
 
-        session = new SessionManager(PengumumanDetailActivity.this);
+        session = new SessionManager(PengumumanDetailTerkirimActivity.this);
 
         getSupportActionBar().setTitle("Detail Pengumuman");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -85,7 +82,7 @@ public class PengumumanDetailActivity extends AppCompatActivity {
         btnHapus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(PengumumanDetailActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(PengumumanDetailTerkirimActivity.this);
 
                 builder.setTitle("Konfirmasi");
                 builder.setMessage("Yakin ingin menghapus data?");
@@ -116,7 +113,7 @@ public class PengumumanDetailActivity extends AppCompatActivity {
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(PengumumanDetailActivity.this, EditPengumumanActivity.class);
+                Intent intent = new Intent(PengumumanDetailTerkirimActivity.this, EditPengumumanActivity.class);
                 intent.putExtra("key_id_pengumuman", id_pengumuman);
                 intent.putExtra("key_judul", judul);
                 intent.putExtra("key_tgl", tanggal);
@@ -188,7 +185,7 @@ public class PengumumanDetailActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(PengumumanDetailActivity.this);
+            pDialog = new ProgressDialog(PengumumanDetailTerkirimActivity.this);
             pDialog.setMessage("Loading...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
@@ -236,11 +233,11 @@ public class PengumumanDetailActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             pDialog.dismiss();
             if(scs == 1){
-                Toast.makeText(PengumumanDetailActivity.this, psn, Toast.LENGTH_SHORT).show();
+                Toast.makeText(PengumumanDetailTerkirimActivity.this, psn, Toast.LENGTH_SHORT).show();
                 finish();
             }
             else{
-                Toast.makeText(PengumumanDetailActivity.this, psn, Toast.LENGTH_SHORT).show();
+                Toast.makeText(PengumumanDetailTerkirimActivity.this, psn, Toast.LENGTH_SHORT).show();
             }
         }
 

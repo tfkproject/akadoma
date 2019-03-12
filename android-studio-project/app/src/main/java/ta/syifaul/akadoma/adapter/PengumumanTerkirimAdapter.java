@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import ta.syifaul.akadoma.PengumumanDetailActivity;
+import ta.syifaul.akadoma.PengumumanDetailTerkirimActivity;
 import ta.syifaul.akadoma.R;
 import ta.syifaul.akadoma.model.ItemPengumuman;
 
@@ -19,19 +20,19 @@ import ta.syifaul.akadoma.model.ItemPengumuman;
  * Created by user on 15/08/18.
  */
 
-public class PengumumanAdapter extends RecyclerView.Adapter<PengumumanAdapter.ViewHolder> {
+public class PengumumanTerkirimAdapter extends RecyclerView.Adapter<PengumumanTerkirimAdapter.ViewHolder> {
 
     List<ItemPengumuman> items;
     Context context;
 
-    public PengumumanAdapter(Context context, List<ItemPengumuman> items) {
+    public PengumumanTerkirimAdapter(Context context, List<ItemPengumuman> items) {
         this.context = context;
         this.items = items;
     }
 
     @Override
-    public PengumumanAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_pengumuman, parent, false);
+    public PengumumanTerkirimAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_pengumuman_terkirim, parent, false);
         return new ViewHolder(view);
     }
 
@@ -40,7 +41,7 @@ public class PengumumanAdapter extends RecyclerView.Adapter<PengumumanAdapter.Vi
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, PengumumanDetailActivity.class);
+                Intent intent = new Intent(context, PengumumanDetailTerkirimActivity.class);
                 intent.putExtra("key_id_pengumuman", items.get(position).getId_pengumuman());
                 intent.putExtra("key_id_user_post", items.get(position).getId_user());
                 intent.putExtra("key_judul", items.get(position).getJudul());

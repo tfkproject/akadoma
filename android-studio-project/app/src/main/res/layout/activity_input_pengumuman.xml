@@ -52,6 +52,11 @@
                     android:layout_marginTop="20dp"
                     android:visibility="gone"/>
 
+                <Spinner
+                    android:id="@+id/tujuan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <Button
                     android:id="@+id/btn_update"
                     android:layout_width="match_parent"

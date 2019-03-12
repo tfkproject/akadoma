@@ -1,20 +1,17 @@
-package ta.syifaul.akadoma.fragment;
+package ta.syifaul.akadoma;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,84 +26,74 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ta.syifaul.akadoma.InputPengumumanActivity;
-import ta.syifaul.akadoma.PengumumanTerkirimActivity;
-import ta.syifaul.akadoma.R;
+import ta.syifaul.akadoma.adapter.JadwalSidangTaAdapter;
 import ta.syifaul.akadoma.adapter.PengumumanAdapter;
+import ta.syifaul.akadoma.adapter.PengumumanTerkirimAdapter;
+import ta.syifaul.akadoma.model.ItemJadwalSidangTa;
 import ta.syifaul.akadoma.model.ItemPengumuman;
 import ta.syifaul.akadoma.util.Config;
 import ta.syifaul.akadoma.util.Request;
+import ta.syifaul.akadoma.util.SessionManager;
 
-/**
- * Created by taufik on 17/04/18.
- */
-
-public class PengumumanFragment extends Fragment {
+public class PengumumanTerkirimActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     TextView txtNotif;
-    private PengumumanAdapter adapter;
+    private PengumumanTerkirimAdapter adapter;
     LinearLayoutManager layoutManager;
     List<ItemPengumuman> items;
     private ProgressDialog pDialog;
+    private SessionManager session;
 
-    private static String url = Config.HOST+"list_pengumuman.php";
-
-    FloatingActionButton fab;
+    private static String url = Config.HOST+"list_pengumuman_terkirim.php";
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        View rootView = inflater.inflate(R.layout.fragment_ly_pengumuman, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_pengumuman_terkirim);
 
-        String level_ = getActivity().getIntent().getStringExtra("level");
+        session = new SessionManager(PengumumanTerkirimActivity.this);
 
-        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        if(level_.contains("mhs")){
-            fab.setVisibility(View.GONE);
-        }else{
-            fab.setVisibility(View.VISIBLE);
-            setHasOptionsMenu(true);
-        }
+        getSupportActionBar().setTitle("Pengumuman Terkirim");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), InputPengumumanActivity.class);
-                startActivity(intent);
-            }
-        });
+        txtNotif = (TextView) findViewById(R.id.txt_notif);
 
-        txtNotif = (TextView) rootView.findViewById(R.id.txt_notif);
-
-        recyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view);
-        layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        layoutManager = new LinearLayoutManager(PengumumanTerkirimActivity.this);
         recyclerView.setLayoutManager(layoutManager);
 
         items = new ArrayList<>();
 
         //new getData().execute();
 
-        adapter = new PengumumanAdapter(getActivity(), items);
+        adapter = new PengumumanTerkirimAdapter(PengumumanTerkirimActivity.this, items);
         recyclerView.setAdapter(adapter);
+    }
 
-        return rootView;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id_menu = item.getItemId();
+        if(id_menu == android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private class getData extends AsyncTask<Void,Void,String> {
 
         //variabel untuk tangkap data
         private int scs = 0;
-        private String psn, tujuan;
+        private String psn, id_user;
 
-        public getData(String tujuan){
-            this.tujuan = tujuan;
+        public getData(String id_user){
+            this.id_user = id_user;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(getActivity());
+            pDialog = new ProgressDialog(PengumumanTerkirimActivity.this);
             pDialog.setMessage("Memuat data...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
@@ -118,7 +105,7 @@ public class PengumumanFragment extends Fragment {
             try{
                 //susun parameter
                 HashMap<String,String> detail = new HashMap<>();
-                detail.put("tujuan", tujuan);
+                detail.put("id_user", id_user);
 
                 try {
                     //convert this HashMap to encodedUrl to send to php file
@@ -213,34 +200,11 @@ public class PengumumanFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
         items.clear();
-        String tujuan = getActivity().getIntent().getStringExtra("level");
-        new getData(tujuan).execute();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // TODO Add your menu entries here
-        inflater.inflate(R.menu.menu_pengumuman, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if(id == R.id.act_terkirim){
-            Intent intent = new Intent(getActivity(), PengumumanTerkirimActivity.class);
-            startActivity(intent);
-        }
-
-
-
-        return super.onOptionsItemSelected(item);
+        HashMap<String, String> user = session.getUserDetails();
+        final String id_user = user.get(SessionManager.KEY_ID_USER);
+        new getData(id_user).execute();
     }
 }
